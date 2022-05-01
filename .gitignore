@@ -1,0 +1,10 @@
+vector
+__pycache__/
+test/coverage
+node_modules
+env/
+.env
+*.pyc
+*.pyo
+eggs
+lib

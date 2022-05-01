@@ -1,0 +1,10 @@
+services:
+    simba:
+        build:
+            context: .
+            target: prod
+            cache_from:
+            - building5/gosu:1.10
+            - convai:latest
+
+version: '2.3'
