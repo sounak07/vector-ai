@@ -5,6 +5,6 @@ def response_out(message, status_code, results=None) -> dict:
     }
 
     if(results is not None):
-        response_obj["result"] = results
+        response_obj["data"] = results
 
     return response_obj

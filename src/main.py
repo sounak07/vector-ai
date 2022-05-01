@@ -1,9 +1,12 @@
 import uvicorn
-from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
+from fastapi import FastAPI, status
 
 from api.v1.api import api_router
 from common.error import InvalidInput
+from services.sql_app import models
+from services.sql_app.database import engine
+
 
 
 app = FastAPI()
@@ -11,13 +14,17 @@ app = FastAPI()
 app = FastAPI(title="SimBa", openapi_url="/api/v1/vector.json")
 app.include_router(api_router, prefix="/api/v1")
 
-# @app.exception_handler(InvalidInput)
-# async def Ip_Error_Handler(request, exc: InvalidInput):
-#     return JSONResponse(
-#         status_code=status.HTTP_400_BAD_REQUEST,
-#         content={"message": f"Oops! {exc} did something. There goes a rainbow..."},
-#     )
+@app.on_event("startup")
+def init_db():
+    models.Base.metadata.create_all(bind=engine)
 
+
+@app.exception_handler(InvalidInput)
+async def Invalid_input(request, exc: InvalidInput):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"message": f"{exc}"},
+    )
 
 @app.get("/")
 async def root():

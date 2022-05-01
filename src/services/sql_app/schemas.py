@@ -17,7 +17,7 @@ class CountryCreate(CountryBase):
 
 class Country(CountryBase):
     id: int
-    continent_id: int
+    continent_name: str
 
     class Config:
         orm_mode = True

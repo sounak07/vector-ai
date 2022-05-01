@@ -8,5 +8,8 @@ class BaseResponse(BaseModel):
 
 class SuccessResponse(BaseResponse):
     message: str
-    result: Optional[dict]
+
+class SuccessResponseResults(BaseResponse):
+    message: str
+    data: Optional[dict]
 
