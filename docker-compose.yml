@@ -1,5 +1,5 @@
 services:
-  simba:
+  vector:
       command: bash -c "cd src/ && uvicorn --host 0.0.0.0 main:app"
       tty: true
       working_dir: /app
@@ -8,7 +8,5 @@ services:
       ports:
         - "${PORT-8080:8000}"
       environment:
-        - MILVUS_PORT=${MILVUS_PORT}
-        - TOP_K=${TOP_K}
-        - HEALTH_NPROBE=${HEALTH_NPROBE}
+        - TEST=${TEST}
 version: "2.3"
