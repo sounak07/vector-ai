@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi import FastAPI, status
 
 from api.v1.api import api_router
-from common.error import InvalidInput
+from common.error import InvalidInput, NotFound
 from services.sql_app import models
 from services.sql_app.database import engine
 
@@ -11,7 +11,7 @@ from services.sql_app.database import engine
 
 app = FastAPI()
 
-app = FastAPI(title="SimBa", openapi_url="/api/v1/vector.json")
+app = FastAPI(title="Vector", openapi_url="/api/v1/vector.json")
 app.include_router(api_router, prefix="/api/v1")
 
 @app.on_event("startup")
@@ -23,6 +23,13 @@ def init_db():
 async def Invalid_input(request, exc: InvalidInput):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
+        content={"message": f"{exc}"},
+    )
+
+@app.exception_handler(NotFound)
+async def Invalid_input(request, exc: NotFound):
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
         content={"message": f"{exc}"},
     )
 

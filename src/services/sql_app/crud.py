@@ -16,6 +16,21 @@ def create_continent(db: Session , continent: schemas.ContinentCreate) -> schema
     db.refresh(db_user)
     return db_user
 
+def update_continent(db: Session , continent: schemas.ContinentUpdate, continent_db: schemas.Continent) -> schemas.Continent:
+    continent_data = continent.dict(exclude_unset=True)
+    for key, value in continent_data.items():
+        setattr(continent_db, key, value)
+    db.add(continent_db)
+    db.commit()
+    db.refresh(continent_db)
+    return continent_db
+
+def delete_continent(db: Session ,continent_db: schemas.Continent) -> dict:
+    db.delete(continent_db)
+    db.commit()
+    return {"deleted": True}
+
+
 def get_countries(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.Country]:
     return db.query(CountryModel).offset(skip).limit(limit).all()
 

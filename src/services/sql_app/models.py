@@ -15,14 +15,14 @@ class ContinentModel(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    countries = relationship("CountryModel", back_populates="continent")
+    countries = relationship("CountryModel", back_populates="continent", cascade="all, delete", passive_deletes=True)
 
 class CountryModel(Base):
     __tablename__ = "countries"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(VARCHAR, index=True, unique=True)
-    continent_name = Column(String, ForeignKey("continents.name"))
+    continent_name = Column(String, ForeignKey("continents.name", ondelete="CASCADE"))
     area = Column(Integer, default=0)
     hospitals = Column(Integer, default=0)
     parks = Column(Integer, default=0)

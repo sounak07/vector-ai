@@ -5,6 +5,6 @@ from libs.response import response_out
 router = APIRouter()
 
 
-@router.get("", response_model=SuccessResponse, response_model_exclude={"simBa_response"})
+@router.get("", response_model=SuccessResponse)
 def health():
     return response_out("healthy", status.HTTP_200_OK)

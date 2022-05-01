@@ -39,5 +39,8 @@ class Continent(ContinentBase):
         orm_mode = True
 
 
+class ContinentUpdate(BaseModel):
+    area: Optional[int] = None
+    population: Optional[int] = None
 
 
