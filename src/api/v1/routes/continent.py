@@ -1,7 +1,4 @@
-from itertools import count
-from typing import List
-
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from common.error import InvalidInput, NotFound
 from services.sql_app import crud, schemas
@@ -19,7 +16,7 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/continent", response_model=SuccessResponse)
+@router.post("/create", response_model=SuccessResponse)
 def create_continent(continent: schemas.ContinentCreate, db: Session = Depends(get_db)):
     db_user = crud.get_continent_by_name(db, name=continent.name)
     if db_user:

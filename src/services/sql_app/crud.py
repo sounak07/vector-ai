@@ -30,9 +30,12 @@ def delete_continent(db: Session ,continent_db: schemas.Continent) -> dict:
     db.commit()
     return {"deleted": True}
 
-
 def get_countries(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.Country]:
     return db.query(CountryModel).offset(skip).limit(limit).all()
+
+def get_countries_by_continent(db: Session, name: str) -> List[schemas.Country]:
+    res = db.query(CountryModel).filter(CountryModel.continent_name == name).all()
+    return res
 
 def get_country_by_name(db: Session , name: str) -> schemas.Country:
     return db.query(CountryModel).filter(CountryModel.name == name).first()
