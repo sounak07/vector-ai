@@ -15,7 +15,7 @@ class ContinentModel(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    countries = relationship("CountryModel", back_populates="continent", cascade="all, delete", passive_deletes=True)
+    countries = relationship("CountryModel", back_populates="continent" ,cascade="all, delete", passive_deletes=True)
 
 class CountryModel(Base):
     __tablename__ = "countries"
@@ -31,5 +31,20 @@ class CountryModel(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     continent = relationship("ContinentModel", back_populates="countries")
+    cities = relationship("CityModel", cascade="all, delete", passive_deletes=True)
 
+class CityModel(Base):
+    __tablename__ = "cities"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(VARCHAR, index=True, unique=True)
+    country_name = Column(String, ForeignKey("countries.name", ondelete="CASCADE"))
+    area = Column(Integer, default=0)
+    roads = Column(Integer, default=0)
+    trees = Column(Integer, default=0)
+    population = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    country = relationship("CountryModel", back_populates="cities")
     

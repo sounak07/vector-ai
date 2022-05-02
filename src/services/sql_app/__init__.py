@@ -1,2 +1,2 @@
-from .models import ContinentModel, CountryModel
-from .schemas import Country, Continent
+from .models import ContinentModel, CountryModel, CityModel
+from .schemas import Country, Continent, City

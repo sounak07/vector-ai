@@ -1,14 +1,12 @@
-from itertools import count
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from common.error import InvalidInput, NotFound
 from services.sql_app import crud, schemas
 from services.sql_app.database import SessionLocal
 from libs.response import response_out
 from api.v1.schemas.response import SuccessResponse
-from libs.utils import contains
 
 router = APIRouter()
 
@@ -20,10 +18,10 @@ def get_db():
     finally:
         db.close()
 
-@router.get("", response_model=SuccessResponse)
+@router.get("", response_model=List[schemas.Country])
 def get_countries(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     countries: List[schemas.Country] = crud.get_countries(db, skip=skip, limit=limit)
-    return response_out("success", status.HTTP_200_OK, results={"countries": countries})
+    return countries
 
 @router.post("/{continent_name}", response_model=SuccessResponse)
 def create_country_by_continent(
@@ -33,23 +31,19 @@ def create_country_by_continent(
     if continent_info is None:
         raise NotFound(f"Oops! Continent {continent_name} not found. There goes a rainbow...")
 
-    countries_by_continent = crud.get_countries_by_continent(db, name=continent_name)
-    continent_country_list = []
-    total_population = 0
-    total_area = 0
-    for coun in countries_by_continent:
-        obj = {
-            "country": coun.name,
-        }
-        total_population += coun.population
-        total_area += coun.area
-        continent_country_list.append(obj)
-
-    if contains(continent_country_list, lambda x: x["country"] == country.name):
+    country_info = crud.get_country_by_name(db, country.name)
+    if country_info:
         raise InvalidInput(f"Oops! Country {country.name} already registered. There goes a rainbow...")
 
+    countries_by_continent = crud.get_countries_by_continent(db, name=continent_name)
+    total_population = 0
+    total_area = 0
+    for instance in countries_by_continent:
+        total_population += instance.population
+        total_area += instance.area
+
     if(total_population + country.population > continent_info.population):
-        raise InvalidInput(f"Oops! Total continent capacity exceeded. We can't accomodate any more people is {continent_name}!")
+        raise InvalidInput(f"Oops! Total continent capacity exceeded. We can't accomodate any more people in {continent_name}!")
 
     if(total_area + country.area > continent_info.area):
         raise InvalidInput("Oops! Total continent area exceeded. We can't form any more countries!")

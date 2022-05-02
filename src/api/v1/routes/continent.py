@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from common.error import InvalidInput, NotFound
@@ -25,18 +26,18 @@ def create_continent(continent: schemas.ContinentCreate, db: Session = Depends(g
     return response_out("Continent registered successfully", status.HTTP_200_OK, results={"res": continent})
 
 
-@router.get("", response_model=SuccessResponse)
+@router.get("", response_model=List[schemas.Continent])
 def get_continents(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     continents = crud.get_continents(db, skip=skip, limit=limit)
-    return response_out("success", status.HTTP_200_OK, results={"continents": continents})
+    return continents
 
 
-@router.get("/{continent_name}", response_model=SuccessResponse)
+@router.get("/{continent_name}", response_model=schemas.Continent)
 def get_continent_by_name(continent_name: str, db: Session = Depends(get_db)):
     continent = crud.get_continent_by_name(db, name=continent_name)
     if continent is None:
         raise NotFound(f"Oops! Continent {continent_name} not found. There goes a rainbow...")
-    return response_out("Country registered successfully", status.HTTP_200_OK, results={"res": continent})
+    return continent
 
 @router.patch("/{continent_name}", response_model=SuccessResponse)
 def update_continent_by_name(continent_name: str, continent: schemas.ContinentUpdate, db: Session = Depends(get_db)):

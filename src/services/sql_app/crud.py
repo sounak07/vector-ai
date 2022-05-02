@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy.orm import Session
 
-from . import ContinentModel, CountryModel , schemas
+from . import ContinentModel, CountryModel , schemas, CityModel
 
 def get_continents(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.Continent]:
     return db.query(ContinentModel).offset(skip).limit(limit).all()
@@ -42,6 +42,23 @@ def get_country_by_name(db: Session , name: str) -> schemas.Country:
 
 def create_country(db: Session , country: schemas.CountryCreate, continent_name: str) -> schemas.Country:
     db_user = CountryModel(**country.dict(), continent_name=continent_name)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def get_cities(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.City]:
+    return db.query(CityModel).offset(skip).limit(limit).all()
+
+def get_city_by_name(db: Session , name: str) -> schemas.City:
+    return db.query(CityModel).filter(CityModel.name == name).first()
+
+def get_cities_by_country(db: Session, name: str) -> List[schemas.City]:
+    res = db.query(CityModel).filter(CityModel.country_name == name).all()
+    return res
+
+def create_city(db: Session , city: schemas.CityCreate, country_name: str) -> schemas.City:
+    db_user = CityModel(**city.dict(), country_name=country_name)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
