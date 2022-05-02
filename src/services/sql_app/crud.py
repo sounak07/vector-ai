@@ -47,6 +47,20 @@ def create_country(db: Session , country: schemas.CountryCreate, continent_name:
     db.refresh(db_user)
     return db_user
 
+def update_country(db: Session , country: schemas.CountryUpdate, country_db: schemas.Country) -> schemas.Country:
+    country_data = country.dict(exclude_unset=True)
+    for key, value in country_data.items():
+        setattr(country_db, key, value)
+    db.add(country_db)
+    db.commit()
+    db.refresh(country_db)
+    return country_db
+
+def delete_country(db: Session ,country_db: schemas.Country) -> dict:
+    db.delete(country_db)
+    db.commit()
+    return {"deleted": True}
+
 def get_cities(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.City]:
     return db.query(CityModel).offset(skip).limit(limit).all()
 

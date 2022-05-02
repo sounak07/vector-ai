@@ -42,10 +42,10 @@ def get_continent_by_name(continent_name: str, db: Session = Depends(get_db)):
 @router.patch("/{continent_name}", response_model=SuccessResponse)
 def update_continent_by_name(continent_name: str, continent: schemas.ContinentUpdate, db: Session = Depends(get_db)):
     continent_db = crud.get_continent_by_name(db, name=continent_name)
-    if continent is None:
+    if continent_db is None:
         raise NotFound(f"Oops! Continent {continent_name} not found. There goes a rainbow...")
     updated_continent = crud.update_continent(db, continent=continent, continent_db=continent_db)
-    return response_out("Country registered successfully", status.HTTP_200_OK, results={"res": updated_continent})
+    return response_out("Continent updated successfully", status.HTTP_200_OK, results={"res": updated_continent})
 
 @router.delete("/{continent_name}", response_model=SuccessResponse)
 def delete_continent_by_name(continent_name: str, db: Session = Depends(get_db)):
@@ -53,4 +53,4 @@ def delete_continent_by_name(continent_name: str, db: Session = Depends(get_db))
     if continent is None:
         raise NotFound(f"Oops! Continent {continent_name} not found. There goes a rainbow...")
     res = crud.delete_continent(db, continent_db=continent)
-    return response_out("Country delete successfully", status.HTTP_200_OK, results={"res": res})
+    return response_out("Continent deleted successfully", status.HTTP_200_OK, results={"res": res})
