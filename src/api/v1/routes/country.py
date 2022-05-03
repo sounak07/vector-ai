@@ -59,22 +59,28 @@ def update_country_by_name(country_name: str, country: schemas.CountryUpdate, db
     if country_db is None:
         raise NotFound(f"Oops! Country {country_name} not found. There goes a rainbow...")
     
-    countries_by_continent = crud.get_countries_by_continent(db, name=country_db.continent_name)
-    
-    continent_info = crud.get_continent_by_name(db, name=country_db.continent_name)
-    total_population = 0
-    total_area = 0
-    for instance in countries_by_continent:
-        if instance.name == country_name:
-            continue
-        total_population += instance.population
-        total_area += instance.area
+    ## optimize more
+    if country.population is not None or country.area is not None:
+        countries_by_continent = crud.get_countries_by_continent(
+            db, name=country_db.continent_name)
 
-    if(total_population + country.population > continent_info.population):
-        raise InvalidInput(f"Oops! Total continent capacity exceeded. We can't accomodate any more people in {country_name}!")
+        continent_info = crud.get_continent_by_name(
+            db, name=country_db.continent_name)
+        total_population = 0
+        total_area = 0
+        for instance in countries_by_continent:
+            if instance.name == country_name:
+                continue
+            total_population += instance.population
+            total_area += instance.area
 
-    if(total_area + country.area > continent_info.area):
-        raise InvalidInput(f"Oops! Total continent area exceeded. We can't increase any more area for {country_name}!")
+        if(country.population is not None and total_population + country.population > continent_info.population):
+            raise InvalidInput(
+                f"Oops! Total continent capacity exceeded. We can't accomodate any more people in {country_name}!")
+
+        if(country.area is not None and total_area + country.area > continent_info.area):
+            raise InvalidInput(
+                f"Oops! Total continent area exceeded. We can't increase any more area for {country_name}!")
 
     updated_country = crud.update_country(db, country=country, country_db=country_db)
     return response_out("Country updated successfully", status.HTTP_200_OK, results={"res": updated_country})

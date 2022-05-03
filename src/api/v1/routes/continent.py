@@ -19,6 +19,7 @@ def get_db():
 
 @router.post("/create", response_model=SuccessResponse)
 def create_continent(continent: schemas.ContinentCreate, db: Session = Depends(get_db)):
+    # we can use try catch to catch the error?
     db_user = crud.get_continent_by_name(db, name=continent.name)
     if db_user:
         raise InvalidInput(f"Oops! Continent {continent.name} already registered. There goes a rainbow...")
@@ -52,5 +53,6 @@ def delete_continent_by_name(continent_name: str, db: Session = Depends(get_db))
     continent = crud.get_continent_by_name(db, name=continent_name)
     if continent is None:
         raise NotFound(f"Oops! Continent {continent_name} not found. There goes a rainbow...")
+    #todo: check allocated area and population to countries
     res = crud.delete_continent(db, continent_db=continent)
     return response_out("Continent deleted successfully", status.HTTP_200_OK, results={"res": res})

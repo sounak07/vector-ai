@@ -77,3 +77,17 @@ def create_city(db: Session , city: schemas.CityCreate, country_name: str) -> sc
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def update_city(db: Session , city: schemas.CityCreate, city_db: schemas.City) -> schemas.City:
+    city_data = city.dict(exclude_unset=True)
+    for key, value in city_data.items():
+        setattr(city_db, key, value)
+    db.add(city_db)
+    db.commit()
+    db.refresh(city_db)
+    return city_db
+
+def delete_city(db: Session ,city_db: schemas.City) -> dict:
+    db.delete(city_db)
+    db.commit()
+    return {"deleted": True}

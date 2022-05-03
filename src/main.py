@@ -8,6 +8,7 @@ from services.sql_app import models
 from services.sql_app.database import engine
 
 
+## https://stackoverflow.com/questions/67599119/fastapi-asynchronous-background-tasks-blocks-other-requests
 
 app = FastAPI()
 
@@ -27,7 +28,7 @@ async def Invalid_input(request, exc: InvalidInput):
     )
 
 @app.exception_handler(NotFound)
-async def Invalid_input(request, exc: NotFound):
+async def Not_found(request, exc: NotFound):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content={"message": f"{exc}"},
