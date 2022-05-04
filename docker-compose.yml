@@ -1,12 +1,77 @@
+version: "3.7"
+
 services:
+  pg:
+    image: "postgres:12.3"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres # The PostgreSQL user (useful to connect to the database)
+      POSTGRES_PASSWORD: postgres123 # The PostgreSQL password (useful to connect to the database)
+      POSTGRES_DB: sounak_db # The PostgreSQL default database (automatically created at first launch)
+    volumes:
+      - ./data-db/:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  flower:
+    image: mher/flower
+    environment: 
+      - CELERY_BROKER_URL=amqp://admin:mypass@rabbitmq
+      - FLOWER_PORT=5555
+    ports: 
+      - 5555:5555
+    depends_on: 
+      - rabbitmq
+  
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
   vector:
-      command: bash -c "cd src/ && uvicorn --host 0.0.0.0 main:app"
-      tty: true
-      working_dir: /app
-      restart: "always"
-      image: convai:latest
-      ports:
-        - "${PORT-8080:8000}"
-      environment:
-        - TEST=${TEST}
-version: "2.3"
+    build: .
+    command: bash -c "uvicorn --host 0.0.0.0 main:app"
+    tty: true
+    restart: "always"
+    image: vector:latest
+    volumes:
+      - ./src:/src
+    depends_on:
+      - rabbitmq
+      - worker
+      - pg
+    ports:
+      - "${PORT-8080:8000}"
+    environment:
+      - DB_USER=postgres   
+      - DB_PASSWORD=postgres123
+      - DB_HOST=pg
+      - DB_PORT=5432
+      - DB_NAME=sounak_db
+      - CELERY_BROKER_URL=amqp://admin:mypass@rabbitmq
+  worker:
+    build: .
+    command: celery -A services.celery.celery_worker.celery worker --loglevel=info
+    image: vector:latest
+    tty: true
+    environment:
+      - DB_USER=postgres   
+      - DB_PASSWORD=postgres123
+      - DB_HOST=pg
+      - DB_PORT=5432
+      - DB_NAME=sounak_db
+      - CELERY_BROKER_URL=amqp://admin:mypass@rabbitmq
+    volumes:
+      - ./src:/src
+    depends_on:
+      - rabbitmq
+
+  

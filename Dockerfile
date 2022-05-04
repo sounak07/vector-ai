@@ -10,12 +10,12 @@ RUN ["chmod", "+x", "/scripts/entrypoint.sh"]
 ENTRYPOINT ["/scripts/entrypoint.sh"]
 
 FROM dev as prod
-WORKDIR /app
-RUN mkdir /app/src
-COPY ./requirements.txt /app/requirements.txt
-COPY ./src /app/src
-COPY .gitignore /app/.gitignore 
-RUN pip install -r /app/requirements.txt 
+WORKDIR /src
+# RUN mkdir /app/src
+COPY ./requirements.txt /src/requirements.txt
+# COPY ./src /src/src
+COPY .gitignore /src/.gitignore 
+RUN pip install -r /src/requirements.txt 
 RUN ["chmod", "+x", "/scripts/entrypoint.sh"]
 ENTRYPOINT ["/scripts/entrypoint.sh"]
 CMD ["/scripts/entrypoint.sh"]
