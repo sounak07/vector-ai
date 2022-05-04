@@ -8,6 +8,8 @@ from services.sql_app.database import SessionLocal
 from libs.response import response_out
 from api.v1.schemas.response import SuccessResponse
 
+from services.celery.celery_worker import create_country_task, update_country_task, delete_country_task
+
 router = APIRouter()
 
 # Dependency
@@ -49,8 +51,8 @@ def create_country_by_continent(
     if(total_area + country.area > continent_info.area):
         raise InvalidInput("Oops! Total continent area exceeded. We can't form any more countries!")
 
-    new_country = crud.create_country(db=db, country=country, continent_name=continent_name)
-    return response_out("Country registered successfully", status.HTTP_200_OK, results={"res": new_country})
+    res = create_country_task.apply_async(args=["country_create_task", country.__dict__, continent_name])
+    return response_out("Country register request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})
 
 
 @router.patch("/{country_name}", response_model=SuccessResponse)
@@ -82,8 +84,8 @@ def update_country_by_name(country_name: str, country: schemas.CountryUpdate, db
             raise InvalidInput(
                 f"Oops! Total continent area exceeded. We can't increase any more area for {country_name}!")
 
-    updated_country = crud.update_country(db, country=country, country_db=country_db)
-    return response_out("Country updated successfully", status.HTTP_200_OK, results={"res": updated_country})
+    res = update_country_task.apply_async(args=["country_update_task", country_name, country.__dict__])
+    return response_out("Country update request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})
 
 
 @router.delete("/{country_name}", response_model=SuccessResponse)
@@ -91,6 +93,7 @@ def delete_country_by_name(country_name: str, db: Session = Depends(get_db)):
     country = crud.get_country_by_name(db, name=country_name)
     if country is None:
         raise NotFound(f"Oops! Country {country_name} not found. There goes a rainbow...")
-    res = crud.delete_country(db, country_db=country)
-    return response_out("Country deleted successfully", status.HTTP_200_OK, results={"res": res})
+    # res = crud.delete_country(db, country_db=country)
+    res = delete_country_task.apply_async(args=["country_delete_task", country_name])
+    return response_out("Country delete request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})
 

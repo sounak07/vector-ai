@@ -8,6 +8,8 @@ from services.sql_app.database import SessionLocal
 from libs.response import response_out
 from api.v1.schemas.response import SuccessResponse
 
+from services.celery.celery_worker import create_city_task, update_city_task, delete_city_task
+
 router = APIRouter()
 
 # Dependency
@@ -48,8 +50,8 @@ def create_city_by_country(
     if(total_area + city.area > country_info.area):
         raise InvalidInput("Oops! Total country area exceeded. We can't form any more cities!")
 
-    new_city = crud.create_city(db=db, city=city, country_name=country_name)
-    return response_out("Country registered successfully", status.HTTP_200_OK, results={"res": new_city})
+    res = create_city_task.apply_async(args=["city_create_task", city.__dict__, country_name])
+    return response_out("City register request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})
 
 @router.patch("/{city_name}", response_model=SuccessResponse)
 def update_country_by_name(city_name: str, city: schemas.CityUpdate, db: Session = Depends(get_db)):
@@ -78,8 +80,8 @@ def update_country_by_name(city_name: str, city: schemas.CityUpdate, db: Session
         if(city.area is not None and total_area + city.area > country_info.area):
             raise InvalidInput(f"Oops! Total continent area exceeded. We can't increase any more area for {city_name}!")
 
-    updated_city = crud.update_city(db, city=city, city_db=city_db)
-    return response_out("City updated successfully", status.HTTP_200_OK, results={"res": updated_city})
+    res = update_city_task.apply_async(args=["city_update_task", city_name, city.__dict__])
+    return response_out("City update request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})
 
 
 @router.delete("/{city_name}", response_model=SuccessResponse)
@@ -87,5 +89,7 @@ def delete_city_by_name(city_name: str, db: Session = Depends(get_db)):
     city = crud.get_city_by_name(db, name=city_name)
     if city is None:
         raise NotFound(f"Oops! Country {city_name} not found. There goes a rainbow...")
-    res = crud.delete_city(db, city_db=city)
-    return response_out("Country deleted successfully", status.HTTP_200_OK, results={"res": res})
+    
+    # res = crud.delete_city(db, city_db=city)
+    res = delete_city_task.apply_async(args=["city_delete_task", city_name])
+    return response_out("Country delete request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})

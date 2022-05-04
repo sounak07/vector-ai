@@ -12,7 +12,5 @@ api_router.include_router(
     country.router, prefix="/country", tags=["country"])
 api_router.include_router(
     city.router, prefix="/city", tags=["city"])
-# api_router.include_router(
-#     task.router, prefix="/task", tags=["worker"])
 
     
