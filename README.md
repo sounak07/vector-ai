@@ -1,3 +1,4 @@
-## To start server in reload mode 
+## To start server 
 
-```uvicorn main:app --reload```
+[Flower](http://localhost:5555/dashboard)
+[Rabbit MQ](http://localhost:15672/#/)

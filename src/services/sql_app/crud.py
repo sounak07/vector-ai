@@ -4,10 +4,12 @@ from sqlalchemy.orm import Session
 from . import ContinentModel, CountryModel , schemas, CityModel
 
 def get_continents(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.Continent]:
-    return db.query(ContinentModel).offset(skip).limit(limit).all()
+    res = db.query(ContinentModel).offset(skip).limit(limit).all()
+    return res
 
 def get_continent_by_name(db: Session , name: str) -> schemas.Continent:
-    return db.query(ContinentModel).filter(ContinentModel.name == name).first()
+    res = db.query(ContinentModel).filter(ContinentModel.name == name).first()
+    return res
 
 def create_continent(db: Session , continent: schemas.ContinentCreate) -> schemas.Continent:
     db_user = ContinentModel(**continent)
@@ -35,14 +37,16 @@ def delete_continent(db: Session ,continent_name: str) -> dict:
     return {"deleted": True}
 
 def get_countries(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.Country]:
-    return db.query(CountryModel).offset(skip).limit(limit).all()
+    res = db.query(CountryModel).offset(skip).limit(limit).all()
+    return res
 
 def get_countries_by_continent(db: Session, name: str) -> List[schemas.Country]:
     res = db.query(CountryModel).filter(CountryModel.continent_name == name).all()
     return res
 
 def get_country_by_name(db: Session , name: str) -> schemas.Country:
-    return db.query(CountryModel).filter(CountryModel.name == name).first()
+    res = db.query(CountryModel).filter(CountryModel.name == name).first()
+    return res
 
 def create_country(db: Session , country: schemas.CountryCreate, continent_name: str) -> schemas.Country:
     db_user = CountryModel(**country, continent_name=continent_name)
@@ -71,10 +75,12 @@ def delete_country(db: Session, country_name: str) -> dict:
     return {"deleted": True}
 
 def get_cities(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.City]:
-    return db.query(CityModel).offset(skip).limit(limit).all()
+    res = db.query(CityModel).offset(skip).limit(limit).all()
+    return res
 
 def get_city_by_name(db: Session , name: str) -> schemas.City:
-    return db.query(CityModel).filter(CityModel.name == name).first()
+    res = db.query(CityModel).filter(CityModel.name == name).first()
+    return res
 
 def get_cities_by_country(db: Session, name: str) -> List[schemas.City]:
     res = db.query(CityModel).filter(CityModel.country_name == name).all()

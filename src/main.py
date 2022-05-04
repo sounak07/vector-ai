@@ -9,6 +9,7 @@ from services.sql_app.database import engine
 
 
 ## https://stackoverflow.com/questions/67599119/fastapi-asynchronous-background-tasks-blocks-other-requests
+## https://towardsdatascience.com/build-an-async-python-service-with-fastapi-sqlalchemy-196d8792fa08
 
 app = FastAPI()
 

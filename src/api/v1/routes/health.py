@@ -6,5 +6,5 @@ router = APIRouter()
 
 
 @router.get("", response_model=SuccessResponse)
-def health():
+async def health():
     return response_out("healthy", status.HTTP_200_OK)

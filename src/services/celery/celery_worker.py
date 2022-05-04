@@ -2,8 +2,9 @@ from services.sql_app import schemas
 from celery import Celery
 from celery.utils.log import get_task_logger
 from sqlalchemy.orm import Session
+from config import config
 
-celery = Celery('tasks', broker='amqp://guest:guest@127.0.0.1:5672//')
+celery = Celery('tasks', broker=config.settings.broker)
 from services.sql_app.database import SessionLocal
 
 # Create logger - enable to display messages on task logger
@@ -23,7 +24,7 @@ def create_continent_task(self, task_name, continent):
     return f"Hi, Your request for {task_name} has completed!"
 
 @celery.task(bind=True)
-def update_continent_task(self, task_name, continent_name ,continent_data):
+def update_continent_task(self, task_name, continent_name, continent_data):
     db: Session = SessionLocal()
     update_continent(db, continent_data=continent_data, continent_name=continent_name)
     # Display Log

@@ -62,8 +62,7 @@ def update_country_by_name(city_name: str, city: schemas.CityUpdate, db: Session
     ## optimize more
     if city.population is not None or city.area is not None:
         print("Sounak")
-        cities_by_country = crud.get_cities_by_country(
-            db, name=city_db.country_name)
+        cities_by_country = crud.get_cities_by_country(db, name=city_db.country_name)
 
         country_info = crud.get_country_by_name(db, name=city_db.country_name)
         total_population = 0

@@ -8,3 +8,4 @@ env/
 *.pyo
 eggs
 lib
+data-db/

@@ -25,7 +25,7 @@ def create_continent(continent: schemas.ContinentCreate, db: Session = Depends(g
     if db_user:
         raise InvalidInput(f"Oops! Continent {continent.name} already registered. There goes a rainbow...")
     # calling task queue
-    res = create_continent_task.apply_async(args=["continent_create_task",continent.__dict__])
+    res = create_continent_task.apply_async(args=["continent_create_task", continent.__dict__])
     return response_out("Continent register request received successfully", status.HTTP_200_OK, results={ "message_id": str(res)})
 
 
@@ -41,7 +41,7 @@ def update_continent_by_name(continent_name: str, continent: schemas.ContinentUp
     if continent_db is None:
         raise NotFound(f"Oops! Continent {continent_name} not found. There goes a rainbow...")
     # for key, value in continent:
-    res = update_continent_task.apply_async(["update_continent_task", continent_name ,continent.__dict__])
+    res = update_continent_task.apply_async(["update_continent_task", continent_name, continent.__dict__])
     return response_out("Continent update request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})
 
 @router.delete("/{continent_name}", response_model=SuccessResponse)

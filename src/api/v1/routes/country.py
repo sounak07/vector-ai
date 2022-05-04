@@ -63,11 +63,9 @@ def update_country_by_name(country_name: str, country: schemas.CountryUpdate, db
     
     ## optimize more
     if country.population is not None or country.area is not None:
-        countries_by_continent = crud.get_countries_by_continent(
-            db, name=country_db.continent_name)
+        countries_by_continent = crud.get_countries_by_continent(db, name=country_db.continent_name)
 
-        continent_info = crud.get_continent_by_name(
-            db, name=country_db.continent_name)
+        continent_info = crud.get_continent_by_name(db, name=country_db.continent_name)
         total_population = 0
         total_area = 0
         for instance in countries_by_continent:
