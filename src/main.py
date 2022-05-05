@@ -8,19 +8,18 @@ from services.sql_app import models
 from services.sql_app.database import engine
 
 
-## https://stackoverflow.com/questions/67599119/fastapi-asynchronous-background-tasks-blocks-other-requests
-## https://towardsdatascience.com/build-an-async-python-service-with-fastapi-sqlalchemy-196d8792fa08
-
 app = FastAPI()
 
 app = FastAPI(title="Vector", openapi_url="/api/v1/vector.json")
 app.include_router(api_router, prefix="/api/v1")
 
+# start up event to create tables if non-existent
 @app.on_event("startup")
 def init_db():
     models.Base.metadata.create_all(bind=engine)
 
 
+# Error handlers to catch various types of exception
 @app.exception_handler(InvalidInput)
 async def Invalid_input(request, exc: InvalidInput):
     return JSONResponse(

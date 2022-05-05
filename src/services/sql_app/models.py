@@ -5,6 +5,14 @@ from sqlalchemy.sql import func
 
 from .database import Base
 
+"""
+To decleare the db models and its relation ships between different models
+
+Relationships for our app : 
+ContinentModel <-> CountryModel <-> CityModel [ <-> represents bidirectional relationships ]
+
+"""
+
 class ContinentModel(Base):
     __tablename__ = "continents" 
 
@@ -14,7 +22,12 @@ class ContinentModel(Base):
     population = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-
+    
+    """
+    cascade="all, delete", passive_deletes=True is added to ensure if parent is deleted child also gets deleted. 
+    Read more: https://docs.sqlalchemy.org/en/14/orm/cascades.html#passive-deletes
+    
+    """
     countries = relationship("CountryModel", back_populates="continent" ,cascade="all, delete", passive_deletes=True)
 
 class CountryModel(Base):
@@ -30,6 +43,9 @@ class CountryModel(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
+    """
+    country has relationship with both city and continent.
+    """
     continent = relationship("ContinentModel", back_populates="countries")
     cities = relationship("CityModel", cascade="all, delete", passive_deletes=True)
 

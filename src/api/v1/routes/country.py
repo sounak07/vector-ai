@@ -12,7 +12,7 @@ from services.celery.celery_worker import create_country_task, update_country_ta
 
 router = APIRouter()
 
-# Dependency
+# Dependency to get db Session
 def get_db():
     db = SessionLocal()
     try:

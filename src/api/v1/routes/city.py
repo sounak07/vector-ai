@@ -12,7 +12,7 @@ from services.celery.celery_worker import create_city_task, update_city_task, de
 
 router = APIRouter()
 
-# Dependency
+# Dependency to get db Session
 def get_db():
     db = SessionLocal()
     try:
@@ -59,9 +59,7 @@ def update_country_by_name(city_name: str, city: schemas.CityUpdate, db: Session
     if city_db is None:
         raise NotFound(f"Oops! Country {city_name} not found. There goes a rainbow...")
     
-    ## optimize more
     if city.population is not None or city.area is not None:
-        print("Sounak")
         cities_by_country = crud.get_cities_by_country(db, name=city_db.country_name)
 
         country_info = crud.get_country_by_name(db, name=city_db.country_name)
@@ -89,6 +87,5 @@ def delete_city_by_name(city_name: str, db: Session = Depends(get_db)):
     if city is None:
         raise NotFound(f"Oops! Country {city_name} not found. There goes a rainbow...")
     
-    # res = crud.delete_city(db, city_db=city)
     res = delete_city_task.apply_async(args=["city_delete_task", city_name])
     return response_out("Country delete request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})

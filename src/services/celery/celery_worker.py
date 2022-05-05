@@ -12,6 +12,9 @@ celery_log = get_task_logger(__name__)
 
 from services.sql_app.crud import create_continent, update_continent, delete_continent, create_country, update_country, delete_country, create_city, update_city, delete_city
 
+"""
+ All the async worker tasks for different operations.
+"""
 
 ## Continent tasks
 @celery.task(bind=True)

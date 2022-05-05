@@ -3,6 +3,10 @@ from sqlalchemy.orm import Session
 
 from . import ContinentModel, CountryModel , schemas, CityModel
 
+"""
+This file contains all the functions to interact with db. Functions to get ,create, update and delete data from db.
+"""
+
 def get_continents(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.Continent]:
     res = db.query(ContinentModel).offset(skip).limit(limit).all()
     return res

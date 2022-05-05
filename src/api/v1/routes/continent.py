@@ -10,7 +10,7 @@ from services.celery.celery_worker import create_continent_task, update_continen
 
 router = APIRouter()
 
-# Dependency
+# Dependency to get db Session
 def get_db():
     db = SessionLocal()
     try:
@@ -18,12 +18,13 @@ def get_db():
     finally:
         db.close()
 
+# response_model will ensure we return response of type SuccessResponse
 @router.post("/create", response_model=SuccessResponse)
 def create_continent(continent: schemas.ContinentCreate, db: Session = Depends(get_db)):
-    # we can use try catch to catch the error?
     db_user = crud.get_continent_by_name(db, name=continent.name)
     if db_user:
         raise InvalidInput(f"Oops! Continent {continent.name} already registered. There goes a rainbow...")
+    
     # calling task queue
     res = create_continent_task.apply_async(args=["continent_create_task", continent.__dict__])
     return response_out("Continent register request received successfully", status.HTTP_200_OK, results={ "message_id": str(res)})
@@ -40,7 +41,8 @@ def update_continent_by_name(continent_name: str, continent: schemas.ContinentUp
     continent_db = crud.get_continent_by_name(db, name=continent_name)
     if continent_db is None:
         raise NotFound(f"Oops! Continent {continent_name} not found. There goes a rainbow...")
-    # for key, value in continent:
+    
+    # calling task queue
     res = update_continent_task.apply_async(["update_continent_task", continent_name, continent.__dict__])
     return response_out("Continent update request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})
 
@@ -51,5 +53,6 @@ def delete_continent_by_name(continent_name: str, db: Session = Depends(get_db))
     if continent is None:
         raise NotFound(f"Oops! Continent {continent_name} not found. There goes a rainbow...")
 
+    # calling task queue
     res = delete_continent_task.apply_async(["delete_continent_task", continent_name])
     return response_out("Continent delete request received successfully", status.HTTP_200_OK, results={"message_id": str(res)})

@@ -1,3 +1,4 @@
+# config file to read ENVs which can be accessed through the app,handy feature from FastApi
 import os
 from pydantic import BaseSettings
 
